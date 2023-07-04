@@ -1,20 +1,21 @@
 from ML_Helpers.Analyses import *
 from ML_Helpers.ResultInterpretationHelpers import *
+import ML_Helpers.ProjectSettings as settings
 
 a1_description = "Effect of lookback days in predicting score"
 test_parameter = "Lookback days"
 name = "Lookback_Analysis"
 path = "./ModelResults"
-
-a2_description = "Effect of lookback days in predicting score - Temp + Humid"
-test_parameter_a2 = "Lookback days - Temp and Humid"
-name_a2 = "Lookback_Analysis_Temp_Humid"
-
-a3_description = "Effect of lookback days in predicting score - Humid only"
-test_parameter_a3 = "Lookback days - Humid only"
-name_a3 = "Lookback_Analysis_Humid"
-
-
+#
+# a2_description = "Effect of lookback days in predicting score - Temp + Humid"
+# test_parameter_a2 = "Lookback days - Temp and Humid"
+# name_a2 = "Lookback_Analysis_Temp_Humid"
+#
+# a3_description = "Effect of lookback days in predicting score - Humid only"
+# test_parameter_a3 = "Lookback days - Humid only"
+# name_a3 = "Lookback_Analysis_Humid"
+#
+#
 a1 = Analysis1(name=name, path=path, description=a1_description,
                parameter="lookback_days")
 a1.run()
@@ -29,3 +30,7 @@ a1.run()
 # a2.plot_r2_curves()
 
 # plot.show()
+
+# model = Sequential()
+# Modeling.import_model(settings.model_definition_path, "Test_CNN_Model", model, (700,5))
+# model.summary()

@@ -1,3 +1,5 @@
+from keras.engine.input_layer import InputLayer
+from keras.layers import Dropout
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import r2_score
 
@@ -9,6 +11,9 @@ import os
 from ML_Helpers.Preprocessing import Data_Preprocessor
 from ML_Helpers.Preprocessing import Dataset
 from ML_Helpers.Definitions import Model_Types
+
+from tensorflow.keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, \
+    LSTM, GlobalAveragePooling1D, Input
 
 
 class Model_Wrapper:
@@ -112,7 +117,7 @@ class Model_Wrapper:
         ax.plot(range(train_len, total_len), y_actual_test, label="Ground Truth - Test")
 
         ax.set_title(f"Ground Truth vs Model Predictions - Model: {self.name}")
-        fig.savefig(path+img_name+".png")
+        fig.savefig(path + img_name + ".png")
 
     def get_training_r_squared(self):
         x_train, y_train = self.dataset.get_train_data(scaled=True)
@@ -132,12 +137,10 @@ class Model_Wrapper:
 
         y_actual_test = self.dataset.inverse_transform_Y(y_test)
 
-
         return r2_score(y_test_pred, y_actual_test)
 
 
 class CNN_ModelWrapper(Model_Wrapper):
-
     timesteps = None
 
     def __init__(self, model=None, name=None, dataset=None, time_window=1):
@@ -175,7 +178,6 @@ class CNN_ModelWrapper(Model_Wrapper):
 
 
 class LSTM_ModelWrapper(Model_Wrapper):
-
     timesteps = None
 
     def __init__(self, model=None, name=None, dataset=None, time_window=1):
@@ -205,3 +207,76 @@ def read_json(filename):
         return json.load(json_file)
 
 
+def import_model(model_definitions_path, model_name, model_object, input_shape):
+    json = read_json(model_definitions_path)
+    model = json[model_name]
+
+    modelBuilder = Model_Builder(model, model_object)
+    return modelBuilder.get_model(input_shape)
+
+
+class Model_Builder:
+    # Json keywords
+    model_type_key = "type"
+    layers_key = "layers"
+    layer_type_key = "layer_type"
+    filters_key = "filters"
+    kernel_size_key = "kernel_size"
+    activation_key = "activation"
+    pool_size_key = "pool_size"
+    dropout_rate_key = "dropout_rate"
+    units_key = "units"
+
+    # Layer types
+    layer_conv1D = "Conv1D"
+    layer_maxpool1D = "MaxPooling1D"
+    layer_GAP1D = "GlobalAveragePooling1D"
+    layer_dropout = "Dropout"
+    layer_dense = "Dense"
+
+    # Activations
+    activation_sigmoid = "sigmoid"
+    activation_relu = "relu"
+
+    def __init__(self, model_dict, model_object):
+        self.model_dict = model_dict
+        self.model = model_object
+
+    def get_model(self, input_shape=None):
+        d = self.model_dict
+        layers = d[self.layers_key]
+
+        if input_shape is not None:
+            self.model.add(InputLayer(input_shape=input_shape, name='Input_Layer'))
+
+        for layer in layers:
+            self.add_layer_to_model(layer)
+
+    def add_layer_to_model(self, layer):
+        layer_type = layer[self.layer_type_key]
+
+        if layer_type == self.layer_conv1D:
+            filters = layer[self.filters_key]
+            kernel_size = layer[self.kernel_size_key]
+            activation = layer[self.activation_key]
+
+            self.model.add(Conv1D(filters=filters, kernel_size=4,
+                                  activation=activation))
+
+        if layer_type == self.layer_maxpool1D:
+            pool_size = layer[self.pool_size_key]
+
+            self.model.add(MaxPooling1D(pool_size))
+
+        if layer_type == self.layer_GAP1D:
+            self.model.add(GlobalAveragePooling1D())
+
+        if layer_type == self.layer_dropout:
+            do_rate = layer[self.dropout_rate_key]
+            self.model.add(Dropout(do_rate))
+
+        if layer_type == self.layer_dense:
+            units = layer[self.units_key]
+            activation = layer[self.activation_key]
+
+            self.model.add(Dense(units, activation=activation))

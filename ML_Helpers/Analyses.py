@@ -2,6 +2,7 @@ from keras.layers import GlobalAveragePooling1D, Dropout
 
 from ML_Helpers import Modeling, Definitions
 from ML_Helpers.Preprocessing import Dataset, Data_Preprocessor
+from ML_Helpers import ProjectSettings as Settings
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, LSTM
@@ -107,18 +108,21 @@ class Analysis1(Analysis):
 
         for i in lookback_range:
             data_preprocessor.set_timesteps(i*24)
-            dataset.preprocess_dataset(remove_gaps=True)
+            dataset.preprocess_dataset(remove_gaps=False)
             dataset.split_data(0.3, shuffle=True)
 
             cnn_model = Sequential()
             cnn = Modeling.LSTM_ModelWrapper(name="Test CNN Model", model=cnn_model, time_window=i * 24, dataset=dataset)
-            cnn_model.add(Conv1D(filters=64, kernel_size=3,
-                                 activation='relu', input_shape=cnn.get_input_shape()))
-            cnn_model.add(MaxPooling1D(pool_size=3))
-            cnn_model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
-            cnn_model.add(GlobalAveragePooling1D())
-            cnn_model.add(Dropout(0.5))
-            cnn_model.add(Dense(units=1, activation='sigmoid'))
+            Modeling.import_model(Settings.model_definition_path, "Test_CNN_Model", cnn_model,
+                                  cnn.get_input_shape())
+            cnn_model.summary()
+            # cnn_model.add(Conv1D(filters=64, kernel_size=3,
+            #                      activation='relu', input_shape=cnn.get_input_shape()))
+            # cnn_model.add(MaxPooling1D(pool_size=3))
+            # cnn_model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+            # cnn_model.add(GlobalAveragePooling1D())
+            # cnn_model.add(Dropout(0.5))
+            # cnn_model.add(Dense(units=1, activation='sigmoid'))
 
             cnn_model.compile(optimizer='adam', loss="mse", metrics=[tf.keras.metrics.MeanAbsoluteError()])
 
