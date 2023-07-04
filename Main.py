@@ -28,6 +28,4 @@ a1.run()
 # runMultipleTimes(a3, 3, name_a3, path)
 # a2.plot_r2_curves()
 
-# I will add a comment here
-
 # plot.show()
