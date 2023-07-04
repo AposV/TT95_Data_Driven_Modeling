@@ -1,0 +1,17 @@
+{
+  "experiments": [
+    {
+      "name": "Experiment1",
+      "dataset_path": "Prepared Datasets/Mar2019Aug2019rs1h.csv",
+      "inputs": ["air_temp_ext1", "air_temp_ib_roof"],
+      "outputs": ["aprtr_change_ext1"],
+      "preprocessing_code": 1,
+      "models": [
+        {
+          "models_type":  "ANN",
+          "models_file": "ANN_Models.json"
+        }
+      ]
+    }
+  ]
+}

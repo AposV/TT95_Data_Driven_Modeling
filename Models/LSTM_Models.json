@@ -1,0 +1,29 @@
+{
+  "lstms": [
+    {
+      "lstm_layers": [32],
+      "dense_layers": [1],
+      "lstm_activations": ["sigmoid"]
+    },
+    {
+      "lstm_layers": [16],
+      "dense_layers": [1],
+      "lstm_activations": ["sigmoid"]
+    },
+    {
+      "lstm_layers": [8],
+      "dense_layers": [1],
+      "lstm_activations": ["sigmoid"]
+    },
+    {
+      "lstm_layers": [32,8],
+      "dense_layers": [1],
+      "lstm_activations": ["sigmoid", "sigmoid"]
+    },
+    {
+      "lstm_layers": [32],
+      "dense_layers": [8,1],
+      "lstm_activations": ["sigmoid"]
+    }
+  ]
+}
